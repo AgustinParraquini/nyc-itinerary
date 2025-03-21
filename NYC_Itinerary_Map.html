@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_f78d14c526efc7821421a5adf4476712 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+<style>
+.day-selector {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    width: 250px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.day-info-panel {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 350px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    max-height: 90vh;
+    overflow-y: auto;
+    display: none;
+    z-index: 1000;
+}
+
+.day-button {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    transition: opacity 0.2s;
+}
+
+.day-button:hover {
+    opacity: 0.9;
+}
+
+.schedule-item {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.time {
+    width: 80px;
+    font-weight: bold;
+    color: #333;
+}
+
+.activity {
+    flex-grow: 1;
+    padding-left: 10px;
+}
+
+.note {
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 5px;
+    font-style: italic;
+}
+</style>
+
+<div class="day-selector">
+    <h4 style="margin: 0 0 15px 0;">Selecciona un día:</h4>
+    <div id="day-buttons">
+
+        <button class="day-button" 
+                onclick="toggleDay('Día 1 - Jueves 08/05')" 
+                style="background-color: red;">
+            Día 1 - Jueves 08/05
+        </button>
+    
+        <button class="day-button" 
+                onclick="toggleDay('Día 2 - Viernes 09/05')" 
+                style="background-color: blue;">
+            Día 2 - Viernes 09/05
+        </button>
+    
+        <button class="day-button" 
+                onclick="toggleDay('Día 3 - Sábado 10/05')" 
+                style="background-color: green;">
+            Día 3 - Sábado 10/05
+        </button>
+    
+        <button class="day-button" 
+                onclick="toggleDay('Día 4 - Domingo 11/05')" 
+                style="background-color: purple;">
+            Día 4 - Domingo 11/05
+        </button>
+    
+        <button class="day-button" 
+                onclick="toggleDay('Día 5 - Lunes 12/05')" 
+                style="background-color: orange;">
+            Día 5 - Lunes 12/05
+        </button>
+    
+        <button class="day-button" 
+                onclick="toggleDay('Día 6 - Martes 13/05')" 
+                style="background-color: darkred;">
+            Día 6 - Martes 13/05
+        </button>
+    
+        <button class="day-button" 
+                onclick="toggleDay('Día 7 - Miércoles 14/05')" 
+                style="background-color: cadetblue;">
+            Día 7 - Miércoles 14/05
+        </button>
+    
+    </div>
+</div>
+
+<div class="day-info-panel" id="day-info">
+    <h3 id="day-title" style="margin: 0 0 10px 0;"></h3>
+    <h4 id="day-subtitle" style="margin: 0 0 15px 0; color: #666;"></h4>
+    <div id="day-note" style="margin-bottom: 20px;"></div>
+    <div id="day-schedule"></div>
+    <div id="day-extra-info" style="margin-top: 20px; color: #666;"></div>
+</div>
+
+<script>
+const dayDetails = {"Día 1 - Jueves 08/05": {"title": "Nueva York - Midtown Manhattan", "schedule": [{"time": "07:20 AM", "activity": "Llegada a NYC"}, {"time": "10:00 AM", "activity": "Llegada al hotel (Paramount Hotel) y dejar maletas"}, {"time": "10:30 AM", "activity": "Desayuno cerca de Times Square (Junior's Cheesecake o Starbucks Reserve Roastery)"}, {"time": "11:30 AM", "activity": "Recorrido por Times Square y fotos (1h)"}, {"time": "12:30 PM", "activity": "Caminata hacia Bryant Park y la Biblioteca Pública de Nueva York (1h)", "note": "Tiempo de caminata: 10 min"}, {"time": "02:00 PM", "activity": "Descanso / snack / regreso breve al hotel si necesario"}, {"time": "04:30 PM", "activity": "SUMMIT One Vanderbilt", "note": "Entrada recomendada 5:00 PM - atardecer, duración aprox. 1.5h"}, {"time": "07:00 PM", "activity": "Cena en Times Square", "note": "Tiempo de caminata: 10-15 min"}]}, "Día 2 - Viernes 09/05": {"title": "Uptown Manhattan (Clima soleado)", "note": "Puedes tomar el bus turístico Hop-On Hop-Off incluido con el NY Pass para llegar al Museo de Historia Natural y luego al Apple Store o MOMA. Ideal si querés descansar las piernas.", "schedule": [{"time": "08:30 AM", "activity": "Desayuno"}, {"time": "09:30 AM", "activity": "Central Park en bicicleta", "note": "Alquiler incluido con el NY Pass (reserva recomendada). Paseo de 6 horas recorriendo Bow Bridge, Bethesda Terrace, Strawberry Fields y otras zonas del parque."}, {"time": "11:30 AM", "activity": "Museo Metropolitano de Arte (MET) (2h)", "note": "NY Pass"}, {"time": "01:30 PM", "activity": "Almuerzo liviano"}, {"time": "02:30 PM", "activity": "Museo de Historia Natural (2h)", "note": "✅ NY Pass - necesita reserva"}, {"time": "04:30 PM", "activity": "Visita al Apple Store de vidrio (30 min)"}, {"time": "05:30 PM", "activity": "Museo Guggenheim o MOMA (opcional según energía)"}, {"time": "08:00 PM", "activity": "Rooftop Somewhere Nowhere", "note": "Noche de fiesta con DJ y tragos"}]}, "Día 3 - Sábado 10/05": {"title": "Midtown Manhattan", "schedule": [{"time": "09:00 AM", "activity": "Desayuno"}, {"time": "10:00 AM", "activity": "Empire State Building (1h)", "note": "✅ NY Pass - necesita reserva"}, {"time": "11:30 AM", "activity": "Madison Square Park (30 min - opcional)"}, {"time": "12:30 PM", "activity": "Tour Madison Square Garden (1h)", "note": "NY Pass (si no hay evento)"}, {"time": "01:45 PM", "activity": "Almuerzo en Midtown"}, {"time": "03:00 PM", "activity": "Madame Tussauds (opcional - 1h)", "note": "NY Pass (no requiere reserva)"}, {"time": "04:30 PM", "activity": "Grand Central Terminal (45 min)"}, {"time": "06:00 PM", "activity": "Bar 230", "note": "Copas con vista al atardecer"}]}, "Día 4 - Domingo 11/05": {"title": "Brooklyn y DUMBO", "schedule": [{"time": "08:30 AM", "activity": "Desayuno en Manhattan"}, {"time": "09:30 AM", "activity": "Caminata o bici cruzando el Puente de Brooklyn (45 min)"}, {"time": "10:30 AM", "activity": "Paseo por DUMBO", "note": "Jane's Carousel, parque frente al río y foto icónica (1h)"}, {"time": "12:00 PM", "activity": "Almuerzo en Time Out Market"}, {"time": "01:30 PM", "activity": "Brooklyn Museum o Botanic Garden (1.5h)", "note": "NY Pass - Opcional"}, {"time": "04:00 PM", "activity": "Paseo por Brooklyn Bridge Park", "note": "Ideal para fotos y descanso antes de cenar"}]}, "Día 5 - Lunes 12/05": {"title": "Downtown Manhattan", "note": "El bus turístico Hop-On Hop-Off puede servirte para llegar hasta Battery Park o para regresar desde el Memorial del 11-S a otras zonas de Manhattan.", "schedule": [{"time": "08:30 AM", "activity": "Ferry a la Estatua de la Libertad y Ellis Island (3h)", "note": "✅ NY Pass - necesita reserva"}, {"time": "12:00 PM", "activity": "Battery Park (30 min)"}, {"time": "12:45 PM", "activity": "One World Observatory (1h)", "note": "NY Pass"}, {"time": "02:00 PM", "activity": "Oculus del World Trade Center (30 min)"}, {"time": "02:45 PM", "activity": "Almuerzo en Eataly Downtown"}, {"time": "04:00 PM", "activity": "Paseo por Wall Street y Charging Bull (45 min)"}, {"time": "05:00 PM", "activity": "Memorial y Museo del 11-S (1.5h)"}, {"time": "07:00 PM", "activity": "Cena en Tribeca o Lower Manhattan"}]}, "Día 6 - Martes 13/05": {"title": "Actividades con New York Pass", "note": "También puedes utilizar el bus turístico Hop-On Hop-Off para moverte entre Radio City Music Hall, Midtown y el Pier 83 para el crucero.", "schedule": [{"time": "08:00 AM", "activity": "Desayuno"}, {"time": "09:00 AM", "activity": "Recorrido por los barrios (NYC Boroughs Tour)", "note": "✅ NY Pass - necesita reserva - duración 5h aprox"}, {"time": "02:00 PM", "activity": "Almuerzo y breve descanso"}, {"time": "03:30 PM", "activity": "Radio City Music Hall (1h)", "note": "NY Pass"}, {"time": "05:00 PM", "activity": "Catedral de St. John the Divine (1h)", "note": "NY Pass"}, {"time": "06:15 PM", "activity": "Llegada al Pier 83 para embarcar"}, {"time": "07:00 PM", "activity": "Harbor Lights Cruise", "note": "✅ NY Pass - necesita reserva - duración 2h"}]}, "Día 7 - Miércoles 14/05": {"title": "Día Libre / Pendientes (sin New York Pass)", "schedule": [{"time": "09:00 AM", "activity": "Desayuno"}, {"time": "10:00 AM", "activity": "Visita al Vessel en Hudson Yards (30 min)"}, {"time": "11:00 AM", "activity": "Pier 57 (45 min)"}, {"time": "12:00 PM", "activity": "Caminata por la Quinta y Séptima Avenida (1h)"}, {"time": "01:30 PM", "activity": "Almuerzo"}, {"time": "03:00 PM", "activity": "Paseo por Harlem - Apollo Theater (opcional)"}, {"time": "05:00 PM", "activity": "Tiempo libre para compras o descanso"}, {"time": "08:00 PM", "activity": "Cena de despedida"}], "extra_info": "\n        Opciones dentro de NY Pass aún disponibles:\n        • Museo Intrepid del Mar, Aire y Espacio\n        • Tour por el Estadio de los Yankees\n        • Edge Observation Deck (si no se repite vista con otras torres)\n        "}};
+
+function createScheduleHTML(schedule) {
+    return schedule.map(item => `
+        <div class="schedule-item">
+            <div class="time">${item.time}</div>
+            <div class="activity">
+                <div>${item.activity}</div>
+                ${item.note ? `<div class="note">${item.note}</div>` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+function toggleDay(selectedDay) {
+    // Obtener todas las capas
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    
+    // Desactivar todas las capas
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) checkbox.click();
+    });
+    
+    // Activar la capa seleccionada
+    checkboxes.forEach(checkbox => {
+        if (checkbox.parentElement.textContent.includes(selectedDay)) {
+            checkbox.click();
+        }
+    });
+    
+    // Actualizar el panel informativo
+    const details = dayDetails[selectedDay];
+    const dayInfo = document.getElementById('day-info');
+    const dayTitle = document.getElementById('day-title');
+    const daySubtitle = document.getElementById('day-subtitle');
+    const dayNote = document.getElementById('day-note');
+    const daySchedule = document.getElementById('day-schedule');
+    const dayExtraInfo = document.getElementById('day-extra-info');
+    
+    dayInfo.style.display = 'block';
+    dayTitle.textContent = selectedDay;
+    dayTitle.style.color = colors[selectedDay];
+    daySubtitle.textContent = details.title;
+    dayNote.innerHTML = details.note || '';
+    daySchedule.innerHTML = createScheduleHTML(details.schedule);
+    dayExtraInfo.innerHTML = details.extra_info || '';
+}
+
+// Desactivar todas las capas al inicio
+window.addEventListener('load', function() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) checkbox.click();
+    });
+});
+
+const colors = {"Día 1 - Jueves 08/05": "red", "Día 2 - Viernes 09/05": "blue", "Día 3 - Sábado 10/05": "green", "Día 4 - Domingo 11/05": "purple", "Día 5 - Lunes 12/05": "orange", "Día 6 - Martes 13/05": "darkred", "Día 7 - Miércoles 14/05": "cadetblue"};</script>
+    
+            <div class="folium-map" id="map_f78d14c526efc7821421a5adf4476712" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_f78d14c526efc7821421a5adf4476712 = L.map(
+                "map_f78d14c526efc7821421a5adf4476712",
+                {
+                    center: [40.758, -73.9855],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 12,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_f2d1c68bdf4c53bc446e630ccbca6aa0 = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_f78d14c526efc7821421a5adf4476712);
+        
+    
+            var feature_group_9db4f1fb66aa20c7601c9301482e6310 = L.featureGroup(
+                {}
+            ).addTo(map_f78d14c526efc7821421a5adf4476712);
+        
+    
+            var marker_9a822682ed822fc5f9f0e60cca770a25 = L.marker(
+                [40.756, -73.986],
+                {}
+            ).addTo(feature_group_9db4f1fb66aa20c7601c9301482e6310);
+        
+    
+            var icon_17d3d694ff75857e5e6752b35b29f576 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_9a822682ed822fc5f9f0e60cca770a25.setIcon(icon_17d3d694ff75857e5e6752b35b29f576);
+        
+    
+        var popup_a3c39bb4558dc7f4010883ed9d530ef6 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_c29ba28929ff494ce583eb1c7e432e6e = $(`<div id="html_c29ba28929ff494ce583eb1c7e432e6e" style="width: 100.0%; height: 100.0%;">Hotel Paramount</div>`)[0];
+                popup_a3c39bb4558dc7f4010883ed9d530ef6.setContent(html_c29ba28929ff494ce583eb1c7e432e6e);
+            
+        
+
+        marker_9a822682ed822fc5f9f0e60cca770a25.bindPopup(popup_a3c39bb4558dc7f4010883ed9d530ef6)
+        ;
+
+        
+    
+    
+            var marker_e1f9782305b0d19db58d7a2dd140d51c = L.marker(
+                [40.758, -73.9855],
+                {}
+            ).addTo(feature_group_9db4f1fb66aa20c7601c9301482e6310);
+        
+    
+            var icon_5c8ea7cc57be353fcb4f3061b11c270d = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_e1f9782305b0d19db58d7a2dd140d51c.setIcon(icon_5c8ea7cc57be353fcb4f3061b11c270d);
+        
+    
+        var popup_8f2e8a4930d36c697abcadc6a4bf1a0e = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_5cc0db3999cf46b59b9905b7b52535de = $(`<div id="html_5cc0db3999cf46b59b9905b7b52535de" style="width: 100.0%; height: 100.0%;">Times Square</div>`)[0];
+                popup_8f2e8a4930d36c697abcadc6a4bf1a0e.setContent(html_5cc0db3999cf46b59b9905b7b52535de);
+            
+        
+
+        marker_e1f9782305b0d19db58d7a2dd140d51c.bindPopup(popup_8f2e8a4930d36c697abcadc6a4bf1a0e)
+        ;
+
+        
+    
+    
+            var marker_7b8ab7ff8b38f14afaf0b7d4c05d8329 = L.marker(
+                [40.7536, -73.9832],
+                {}
+            ).addTo(feature_group_9db4f1fb66aa20c7601c9301482e6310);
+        
+    
+            var icon_5d279983fcd7bf18c57603d19cb1fc9f = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_7b8ab7ff8b38f14afaf0b7d4c05d8329.setIcon(icon_5d279983fcd7bf18c57603d19cb1fc9f);
+        
+    
+        var popup_81042fd4452ef1db44f79b1d9fdd78fa = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_47f5abd72b9590cdb8508a5c75b32a31 = $(`<div id="html_47f5abd72b9590cdb8508a5c75b32a31" style="width: 100.0%; height: 100.0%;">Bryant Park & Biblioteca Pública</div>`)[0];
+                popup_81042fd4452ef1db44f79b1d9fdd78fa.setContent(html_47f5abd72b9590cdb8508a5c75b32a31);
+            
+        
+
+        marker_7b8ab7ff8b38f14afaf0b7d4c05d8329.bindPopup(popup_81042fd4452ef1db44f79b1d9fdd78fa)
+        ;
+
+        
+    
+    
+            var marker_2031195db4af6761966c3bcb18c3c8dd = L.marker(
+                [40.7523, -73.9777],
+                {}
+            ).addTo(feature_group_9db4f1fb66aa20c7601c9301482e6310);
+        
+    
+            var icon_0eb032bc6a08d868261c5af3ed1d1f64 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_2031195db4af6761966c3bcb18c3c8dd.setIcon(icon_0eb032bc6a08d868261c5af3ed1d1f64);
+        
+    
+        var popup_a486ea679f49bc8af6e71cb6fba199bd = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_b0efded8719f42bc47f5d7b501b1d233 = $(`<div id="html_b0efded8719f42bc47f5d7b501b1d233" style="width: 100.0%; height: 100.0%;">SUMMIT One Vanderbilt</div>`)[0];
+                popup_a486ea679f49bc8af6e71cb6fba199bd.setContent(html_b0efded8719f42bc47f5d7b501b1d233);
+            
+        
+
+        marker_2031195db4af6761966c3bcb18c3c8dd.bindPopup(popup_a486ea679f49bc8af6e71cb6fba199bd)
+        ;
+
+        
+    
+    
+            var marker_2ebfe74697ceab555824847e35ffd47b = L.marker(
+                [40.758, -73.9855],
+                {}
+            ).addTo(feature_group_9db4f1fb66aa20c7601c9301482e6310);
+        
+    
+            var icon_1a7f3e339fdd4afb5efbd4486b7327fc = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_2ebfe74697ceab555824847e35ffd47b.setIcon(icon_1a7f3e339fdd4afb5efbd4486b7327fc);
+        
+    
+        var popup_057bff071b4c707e6603ccb8beab0572 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_c960a2e48453d07d7fb3b5db2602c872 = $(`<div id="html_c960a2e48453d07d7fb3b5db2602c872" style="width: 100.0%; height: 100.0%;">Cena en Times Square</div>`)[0];
+                popup_057bff071b4c707e6603ccb8beab0572.setContent(html_c960a2e48453d07d7fb3b5db2602c872);
+            
+        
+
+        marker_2ebfe74697ceab555824847e35ffd47b.bindPopup(popup_057bff071b4c707e6603ccb8beab0572)
+        ;
+
+        
+    
+    
+            var poly_line_48cdba80fda143f21132156a25d62272 = L.polyline(
+                [[40.756, -73.986], [40.758, -73.9855], [40.7536, -73.9832], [40.7523, -73.9777], [40.758, -73.9855]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(feature_group_9db4f1fb66aa20c7601c9301482e6310);
+        
+    
+            var feature_group_0f0e890533f28fb12c716e7404276637 = L.featureGroup(
+                {}
+            ).addTo(map_f78d14c526efc7821421a5adf4476712);
+        
+    
+            var marker_5646436db5db6bff77737ce9911120b4 = L.marker(
+                [40.7759, -73.9719],
+                {}
+            ).addTo(feature_group_0f0e890533f28fb12c716e7404276637);
+        
+    
+            var icon_bdc71ea2586945d416ef2b4802145412 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "blue", "prefix": "glyphicon"}
+            );
+            marker_5646436db5db6bff77737ce9911120b4.setIcon(icon_bdc71ea2586945d416ef2b4802145412);
+        
+    
+        var popup_d6366a717f3c7b45a5dd7cafe9b5d3b9 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_a329e8c68f5a28c685afd4404e64ddbc = $(`<div id="html_a329e8c68f5a28c685afd4404e64ddbc" style="width: 100.0%; height: 100.0%;">Bow Bridge, Central Park</div>`)[0];
+                popup_d6366a717f3c7b45a5dd7cafe9b5d3b9.setContent(html_a329e8c68f5a28c685afd4404e64ddbc);
+            
+        
+
+        marker_5646436db5db6bff77737ce9911120b4.bindPopup(popup_d6366a717f3c7b45a5dd7cafe9b5d3b9)
+        ;
+
+        
+    
+    
+            var marker_1b30bcc5ec5fce99e49ec8a7828a0acf = L.marker(
+                [40.7794, -73.9632],
+                {}
+            ).addTo(feature_group_0f0e890533f28fb12c716e7404276637);
+        
+    
+            var icon_cf4b750ae4b695fc6e75835360cfe223 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "blue", "prefix": "glyphicon"}
+            );
+            marker_1b30bcc5ec5fce99e49ec8a7828a0acf.setIcon(icon_cf4b750ae4b695fc6e75835360cfe223);
+        
+    
+        var popup_276068c4916fb025b41b8ebb360826bb = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_27240331539886fd795a221b238616d9 = $(`<div id="html_27240331539886fd795a221b238616d9" style="width: 100.0%; height: 100.0%;">Museo MET</div>`)[0];
+                popup_276068c4916fb025b41b8ebb360826bb.setContent(html_27240331539886fd795a221b238616d9);
+            
+        
+
+        marker_1b30bcc5ec5fce99e49ec8a7828a0acf.bindPopup(popup_276068c4916fb025b41b8ebb360826bb)
+        ;
+
+        
+    
+    
+            var marker_f23a4584223b744a12ffb2f5a8c87e01 = L.marker(
+                [40.7813, -73.9735],
+                {}
+            ).addTo(feature_group_0f0e890533f28fb12c716e7404276637);
+        
+    
+            var icon_a6052d9b1f463b5fdce2e9e44b2c0225 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "blue", "prefix": "glyphicon"}
+            );
+            marker_f23a4584223b744a12ffb2f5a8c87e01.setIcon(icon_a6052d9b1f463b5fdce2e9e44b2c0225);
+        
+    
+        var popup_28a9c6432dc674ddb47b1a24a2c34326 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_1611224ca3a3f7810da6ba516024def0 = $(`<div id="html_1611224ca3a3f7810da6ba516024def0" style="width: 100.0%; height: 100.0%;">Museo de Historia Natural</div>`)[0];
+                popup_28a9c6432dc674ddb47b1a24a2c34326.setContent(html_1611224ca3a3f7810da6ba516024def0);
+            
+        
+
+        marker_f23a4584223b744a12ffb2f5a8c87e01.bindPopup(popup_28a9c6432dc674ddb47b1a24a2c34326)
+        ;
+
+        
+    
+    
+            var marker_c660331cef50c4af6fc7651f9ad5a8e7 = L.marker(
+                [40.7635, -73.9726],
+                {}
+            ).addTo(feature_group_0f0e890533f28fb12c716e7404276637);
+        
+    
+            var icon_e8ee14f3e7352dec43250e6ad6940860 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "blue", "prefix": "glyphicon"}
+            );
+            marker_c660331cef50c4af6fc7651f9ad5a8e7.setIcon(icon_e8ee14f3e7352dec43250e6ad6940860);
+        
+    
+        var popup_6020b4f6d6e70a7b8c25f333e1e082c8 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_086119d491c2771d0ab6d621dfc6b8d6 = $(`<div id="html_086119d491c2771d0ab6d621dfc6b8d6" style="width: 100.0%; height: 100.0%;">Apple Store de vidrio</div>`)[0];
+                popup_6020b4f6d6e70a7b8c25f333e1e082c8.setContent(html_086119d491c2771d0ab6d621dfc6b8d6);
+            
+        
+
+        marker_c660331cef50c4af6fc7651f9ad5a8e7.bindPopup(popup_6020b4f6d6e70a7b8c25f333e1e082c8)
+        ;
+
+        
+    
+    
+            var marker_634d88a98ad11a270d575900b9dd661e = L.marker(
+                [40.783, -73.959],
+                {}
+            ).addTo(feature_group_0f0e890533f28fb12c716e7404276637);
+        
+    
+            var icon_50701d5159dd59dd81981341713ec9c9 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "blue", "prefix": "glyphicon"}
+            );
+            marker_634d88a98ad11a270d575900b9dd661e.setIcon(icon_50701d5159dd59dd81981341713ec9c9);
+        
+    
+        var popup_6f48b406f50c82533263acec19989056 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_b778607c0ef7899826fd8d2965dfe40c = $(`<div id="html_b778607c0ef7899826fd8d2965dfe40c" style="width: 100.0%; height: 100.0%;">Museo Guggenheim</div>`)[0];
+                popup_6f48b406f50c82533263acec19989056.setContent(html_b778607c0ef7899826fd8d2965dfe40c);
+            
+        
+
+        marker_634d88a98ad11a270d575900b9dd661e.bindPopup(popup_6f48b406f50c82533263acec19989056)
+        ;
+
+        
+    
+    
+            var marker_223fd8153dfa3ad19a9dd7b28404a7d6 = L.marker(
+                [40.758, -73.9855],
+                {}
+            ).addTo(feature_group_0f0e890533f28fb12c716e7404276637);
+        
+    
+            var icon_2e044bf4b82dccb4530fcea47f1b7d18 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "blue", "prefix": "glyphicon"}
+            );
+            marker_223fd8153dfa3ad19a9dd7b28404a7d6.setIcon(icon_2e044bf4b82dccb4530fcea47f1b7d18);
+        
+    
+        var popup_da1906b987b5d4b3f1a9133be3b8d07b = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_ffc21d4fe13f558ddb934b8541841d2e = $(`<div id="html_ffc21d4fe13f558ddb934b8541841d2e" style="width: 100.0%; height: 100.0%;">Rooftop Somewhere Nowhere</div>`)[0];
+                popup_da1906b987b5d4b3f1a9133be3b8d07b.setContent(html_ffc21d4fe13f558ddb934b8541841d2e);
+            
+        
+
+        marker_223fd8153dfa3ad19a9dd7b28404a7d6.bindPopup(popup_da1906b987b5d4b3f1a9133be3b8d07b)
+        ;
+
+        
+    
+    
+            var poly_line_cfae2254f035c98e679f7ee975445d18 = L.polyline(
+                [[40.7759, -73.9719], [40.7794, -73.9632], [40.7813, -73.9735], [40.7635, -73.9726], [40.783, -73.959], [40.758, -73.9855]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(feature_group_0f0e890533f28fb12c716e7404276637);
+        
+    
+            var feature_group_334006bdd90d5c8d894557e0c96c6adb = L.featureGroup(
+                {}
+            ).addTo(map_f78d14c526efc7821421a5adf4476712);
+        
+    
+            var marker_62b592001b574acb5c39e6de00894a05 = L.marker(
+                [40.7484, -73.9857],
+                {}
+            ).addTo(feature_group_334006bdd90d5c8d894557e0c96c6adb);
+        
+    
+            var icon_74d9fa43c2bab6bbd6ec6ba38a56c733 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_62b592001b574acb5c39e6de00894a05.setIcon(icon_74d9fa43c2bab6bbd6ec6ba38a56c733);
+        
+    
+        var popup_8ddfb5f1bd06b98efb9142a4cbd89b78 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_9a344531471ee72fe18aa5effe286334 = $(`<div id="html_9a344531471ee72fe18aa5effe286334" style="width: 100.0%; height: 100.0%;">Empire State Building</div>`)[0];
+                popup_8ddfb5f1bd06b98efb9142a4cbd89b78.setContent(html_9a344531471ee72fe18aa5effe286334);
+            
+        
+
+        marker_62b592001b574acb5c39e6de00894a05.bindPopup(popup_8ddfb5f1bd06b98efb9142a4cbd89b78)
+        ;
+
+        
+    
+    
+            var marker_39427779a06e00bbc3a2ad24f7f332ef = L.marker(
+                [40.742, -73.9876],
+                {}
+            ).addTo(feature_group_334006bdd90d5c8d894557e0c96c6adb);
+        
+    
+            var icon_989e27ff37fdcbfb68c96e85f6acfe5e = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_39427779a06e00bbc3a2ad24f7f332ef.setIcon(icon_989e27ff37fdcbfb68c96e85f6acfe5e);
+        
+    
+        var popup_32500109788150d35816b035c5c0a0be = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_5acf0b89d0237029aeca662d7c232488 = $(`<div id="html_5acf0b89d0237029aeca662d7c232488" style="width: 100.0%; height: 100.0%;">Madison Square Park</div>`)[0];
+                popup_32500109788150d35816b035c5c0a0be.setContent(html_5acf0b89d0237029aeca662d7c232488);
+            
+        
+
+        marker_39427779a06e00bbc3a2ad24f7f332ef.bindPopup(popup_32500109788150d35816b035c5c0a0be)
+        ;
+
+        
+    
+    
+            var marker_99d5fde4b6f17a9c68166c2b75f9d2d3 = L.marker(
+                [40.7505, -73.9934],
+                {}
+            ).addTo(feature_group_334006bdd90d5c8d894557e0c96c6adb);
+        
+    
+            var icon_59913ae506cbacf55c7eaef63c76b0bf = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_99d5fde4b6f17a9c68166c2b75f9d2d3.setIcon(icon_59913ae506cbacf55c7eaef63c76b0bf);
+        
+    
+        var popup_0f38d8b0ab49bd9b201284f939a950f0 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_7fa29e5c5bfa1c790b147381522c429c = $(`<div id="html_7fa29e5c5bfa1c790b147381522c429c" style="width: 100.0%; height: 100.0%;">Madison Square Garden</div>`)[0];
+                popup_0f38d8b0ab49bd9b201284f939a950f0.setContent(html_7fa29e5c5bfa1c790b147381522c429c);
+            
+        
+
+        marker_99d5fde4b6f17a9c68166c2b75f9d2d3.bindPopup(popup_0f38d8b0ab49bd9b201284f939a950f0)
+        ;
+
+        
+    
+    
+            var marker_89ac7a59f83650aa1cd5d9794d10096e = L.marker(
+                [40.7564, -73.9884],
+                {}
+            ).addTo(feature_group_334006bdd90d5c8d894557e0c96c6adb);
+        
+    
+            var icon_1ed138678f2d23abbc46de6636cae8c7 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_89ac7a59f83650aa1cd5d9794d10096e.setIcon(icon_1ed138678f2d23abbc46de6636cae8c7);
+        
+    
+        var popup_90ac025d523debf82113bf1b3fde6f13 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_7456b9d643c10fe5962df195640e0bfd = $(`<div id="html_7456b9d643c10fe5962df195640e0bfd" style="width: 100.0%; height: 100.0%;">Madame Tussauds</div>`)[0];
+                popup_90ac025d523debf82113bf1b3fde6f13.setContent(html_7456b9d643c10fe5962df195640e0bfd);
+            
+        
+
+        marker_89ac7a59f83650aa1cd5d9794d10096e.bindPopup(popup_90ac025d523debf82113bf1b3fde6f13)
+        ;
+
+        
+    
+    
+            var marker_b922cb059adf29646535b1a79fce9087 = L.marker(
+                [40.7527, -73.9772],
+                {}
+            ).addTo(feature_group_334006bdd90d5c8d894557e0c96c6adb);
+        
+    
+            var icon_df76dae6a4727a5c8b962bdf17aa5159 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_b922cb059adf29646535b1a79fce9087.setIcon(icon_df76dae6a4727a5c8b962bdf17aa5159);
+        
+    
+        var popup_58cd1c38a4f160765bca2959362cc9a4 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_eda4e812a145d83b7614dddfb3ad2589 = $(`<div id="html_eda4e812a145d83b7614dddfb3ad2589" style="width: 100.0%; height: 100.0%;">Grand Central Terminal</div>`)[0];
+                popup_58cd1c38a4f160765bca2959362cc9a4.setContent(html_eda4e812a145d83b7614dddfb3ad2589);
+            
+        
+
+        marker_b922cb059adf29646535b1a79fce9087.bindPopup(popup_58cd1c38a4f160765bca2959362cc9a4)
+        ;
+
+        
+    
+    
+            var marker_97c0299408297134f48ab3702b76aec0 = L.marker(
+                [40.7508, -73.9887],
+                {}
+            ).addTo(feature_group_334006bdd90d5c8d894557e0c96c6adb);
+        
+    
+            var icon_207a2c59c1c74bad6c1b7f57e7a0590e = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_97c0299408297134f48ab3702b76aec0.setIcon(icon_207a2c59c1c74bad6c1b7f57e7a0590e);
+        
+    
+        var popup_1cf4b6d856023cc844f4d4c0323d7d75 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_13f0f028dbd754d68a72e681d1bf8059 = $(`<div id="html_13f0f028dbd754d68a72e681d1bf8059" style="width: 100.0%; height: 100.0%;">Bar 230</div>`)[0];
+                popup_1cf4b6d856023cc844f4d4c0323d7d75.setContent(html_13f0f028dbd754d68a72e681d1bf8059);
+            
+        
+
+        marker_97c0299408297134f48ab3702b76aec0.bindPopup(popup_1cf4b6d856023cc844f4d4c0323d7d75)
+        ;
+
+        
+    
+    
+            var poly_line_ffc00272c4147f89bcca6453cbef3e01 = L.polyline(
+                [[40.7484, -73.9857], [40.742, -73.9876], [40.7505, -73.9934], [40.7564, -73.9884], [40.7527, -73.9772], [40.7508, -73.9887]],
+                {"bubblingMouseEvents": true, "color": "green", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "green", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(feature_group_334006bdd90d5c8d894557e0c96c6adb);
+        
+    
+            var feature_group_b2b9e6c70c67bcb26be5d68c9e5973c7 = L.featureGroup(
+                {}
+            ).addTo(map_f78d14c526efc7821421a5adf4476712);
+        
+    
+            var marker_d1c8f1681afdc33fb66849c4f1ffef22 = L.marker(
+                [40.7061, -74.0086],
+                {}
+            ).addTo(feature_group_b2b9e6c70c67bcb26be5d68c9e5973c7);
+        
+    
+            var icon_88c78bdc1f802e3efe724c34d8885845 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "purple", "prefix": "glyphicon"}
+            );
+            marker_d1c8f1681afdc33fb66849c4f1ffef22.setIcon(icon_88c78bdc1f802e3efe724c34d8885845);
+        
+    
+        var popup_f12ef09f2722386988d90585e7c44885 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_7cab654b09f55bf1c8895fec8ea36035 = $(`<div id="html_7cab654b09f55bf1c8895fec8ea36035" style="width: 100.0%; height: 100.0%;">Puente de Brooklyn (Manhattan)</div>`)[0];
+                popup_f12ef09f2722386988d90585e7c44885.setContent(html_7cab654b09f55bf1c8895fec8ea36035);
+            
+        
+
+        marker_d1c8f1681afdc33fb66849c4f1ffef22.bindPopup(popup_f12ef09f2722386988d90585e7c44885)
+        ;
+
+        
+    
+    
+            var marker_c320fa6e327de5f9f9fc83d2c99beeeb = L.marker(
+                [40.7033, -73.9881],
+                {}
+            ).addTo(feature_group_b2b9e6c70c67bcb26be5d68c9e5973c7);
+        
+    
+            var icon_caabe7d6f3dd43f1de6e465ed81cb971 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "purple", "prefix": "glyphicon"}
+            );
+            marker_c320fa6e327de5f9f9fc83d2c99beeeb.setIcon(icon_caabe7d6f3dd43f1de6e465ed81cb971);
+        
+    
+        var popup_dc8fceb767088ee87ebd0b15003a3e72 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_6c79b3ed1446fb4e3b15d7f6bc4b5908 = $(`<div id="html_6c79b3ed1446fb4e3b15d7f6bc4b5908" style="width: 100.0%; height: 100.0%;">DUMBO</div>`)[0];
+                popup_dc8fceb767088ee87ebd0b15003a3e72.setContent(html_6c79b3ed1446fb4e3b15d7f6bc4b5908);
+            
+        
+
+        marker_c320fa6e327de5f9f9fc83d2c99beeeb.bindPopup(popup_dc8fceb767088ee87ebd0b15003a3e72)
+        ;
+
+        
+    
+    
+            var marker_1f8d61ee85f8498755de9444ba45eb74 = L.marker(
+                [40.7022, -73.9881],
+                {}
+            ).addTo(feature_group_b2b9e6c70c67bcb26be5d68c9e5973c7);
+        
+    
+            var icon_42cc9bef2461a95be39424e580495e39 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "purple", "prefix": "glyphicon"}
+            );
+            marker_1f8d61ee85f8498755de9444ba45eb74.setIcon(icon_42cc9bef2461a95be39424e580495e39);
+        
+    
+        var popup_92485defe54443e29130fbd4d4296f3e = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_0678d6682642ccc97ec51af321b7366a = $(`<div id="html_0678d6682642ccc97ec51af321b7366a" style="width: 100.0%; height: 100.0%;">Time Out Market</div>`)[0];
+                popup_92485defe54443e29130fbd4d4296f3e.setContent(html_0678d6682642ccc97ec51af321b7366a);
+            
+        
+
+        marker_1f8d61ee85f8498755de9444ba45eb74.bindPopup(popup_92485defe54443e29130fbd4d4296f3e)
+        ;
+
+        
+    
+    
+            var marker_b7dc1a2e11cd11842541b050ccb70870 = L.marker(
+                [40.6712, -73.9636],
+                {}
+            ).addTo(feature_group_b2b9e6c70c67bcb26be5d68c9e5973c7);
+        
+    
+            var icon_42d35fa741a0a6137c30818924def003 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "purple", "prefix": "glyphicon"}
+            );
+            marker_b7dc1a2e11cd11842541b050ccb70870.setIcon(icon_42d35fa741a0a6137c30818924def003);
+        
+    
+        var popup_3f00e67377fb5390b385322fad39da5c = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_d287e45dcd22825fb79fe5bdbce37252 = $(`<div id="html_d287e45dcd22825fb79fe5bdbce37252" style="width: 100.0%; height: 100.0%;">Brooklyn Museum</div>`)[0];
+                popup_3f00e67377fb5390b385322fad39da5c.setContent(html_d287e45dcd22825fb79fe5bdbce37252);
+            
+        
+
+        marker_b7dc1a2e11cd11842541b050ccb70870.bindPopup(popup_3f00e67377fb5390b385322fad39da5c)
+        ;
+
+        
+    
+    
+            var marker_99e56f9fcd169697c8c17ba48671d126 = L.marker(
+                [40.6694, -73.9624],
+                {}
+            ).addTo(feature_group_b2b9e6c70c67bcb26be5d68c9e5973c7);
+        
+    
+            var icon_d156b844420c65b59b92ba8bd0084c2a = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "purple", "prefix": "glyphicon"}
+            );
+            marker_99e56f9fcd169697c8c17ba48671d126.setIcon(icon_d156b844420c65b59b92ba8bd0084c2a);
+        
+    
+        var popup_b80606daef78952203910e52db90205c = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_815a11f2e4eb42f7c437964eb3d8dbec = $(`<div id="html_815a11f2e4eb42f7c437964eb3d8dbec" style="width: 100.0%; height: 100.0%;">Brooklyn Botanic Garden</div>`)[0];
+                popup_b80606daef78952203910e52db90205c.setContent(html_815a11f2e4eb42f7c437964eb3d8dbec);
+            
+        
+
+        marker_99e56f9fcd169697c8c17ba48671d126.bindPopup(popup_b80606daef78952203910e52db90205c)
+        ;
+
+        
+    
+    
+            var marker_2ac029a6761c19740049ddbbddf1530d = L.marker(
+                [40.7003, -73.9967],
+                {}
+            ).addTo(feature_group_b2b9e6c70c67bcb26be5d68c9e5973c7);
+        
+    
+            var icon_23b053d5da83394e50558bb46767d5a3 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "purple", "prefix": "glyphicon"}
+            );
+            marker_2ac029a6761c19740049ddbbddf1530d.setIcon(icon_23b053d5da83394e50558bb46767d5a3);
+        
+    
+        var popup_22f09b1edb83e974f561711483e8b12b = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_99df4da161657c205fb06966ecaffc05 = $(`<div id="html_99df4da161657c205fb06966ecaffc05" style="width: 100.0%; height: 100.0%;">Brooklyn Bridge Park</div>`)[0];
+                popup_22f09b1edb83e974f561711483e8b12b.setContent(html_99df4da161657c205fb06966ecaffc05);
+            
+        
+
+        marker_2ac029a6761c19740049ddbbddf1530d.bindPopup(popup_22f09b1edb83e974f561711483e8b12b)
+        ;
+
+        
+    
+    
+            var poly_line_e821c555c57adeafbb5c0dace939456b = L.polyline(
+                [[40.7061, -74.0086], [40.7033, -73.9881], [40.7022, -73.9881], [40.6712, -73.9636], [40.6694, -73.9624], [40.7003, -73.9967]],
+                {"bubblingMouseEvents": true, "color": "purple", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "purple", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(feature_group_b2b9e6c70c67bcb26be5d68c9e5973c7);
+        
+    
+            var feature_group_2463ce90c7c8fcbe78dda970711c4c82 = L.featureGroup(
+                {}
+            ).addTo(map_f78d14c526efc7821421a5adf4476712);
+        
+    
+            var marker_17e7496313f312cc0366e950dd6e6a25 = L.marker(
+                [40.7033, -74.017],
+                {}
+            ).addTo(feature_group_2463ce90c7c8fcbe78dda970711c4c82);
+        
+    
+            var icon_47d5c3f6343d62759e8905784ae851d9 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "orange", "prefix": "glyphicon"}
+            );
+            marker_17e7496313f312cc0366e950dd6e6a25.setIcon(icon_47d5c3f6343d62759e8905784ae851d9);
+        
+    
+        var popup_12e8ad73cb281e38e990047f40fb1b34 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_24e488d0addbd9e13c981c30864c1cbd = $(`<div id="html_24e488d0addbd9e13c981c30864c1cbd" style="width: 100.0%; height: 100.0%;">Battery Park (Ferry Estatua Libertad)</div>`)[0];
+                popup_12e8ad73cb281e38e990047f40fb1b34.setContent(html_24e488d0addbd9e13c981c30864c1cbd);
+            
+        
+
+        marker_17e7496313f312cc0366e950dd6e6a25.bindPopup(popup_12e8ad73cb281e38e990047f40fb1b34)
+        ;
+
+        
+    
+    
+            var marker_5458e2c402b99153de81f9aa5e0ae7f5 = L.marker(
+                [40.7127, -74.0134],
+                {}
+            ).addTo(feature_group_2463ce90c7c8fcbe78dda970711c4c82);
+        
+    
+            var icon_f8ec091bac8320a3d63cbd7c7282ae88 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "orange", "prefix": "glyphicon"}
+            );
+            marker_5458e2c402b99153de81f9aa5e0ae7f5.setIcon(icon_f8ec091bac8320a3d63cbd7c7282ae88);
+        
+    
+        var popup_f880c3abcc5bd25751153bf65bc39257 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_7d0ef842f6d93e94bc441990134c9d20 = $(`<div id="html_7d0ef842f6d93e94bc441990134c9d20" style="width: 100.0%; height: 100.0%;">One World Observatory</div>`)[0];
+                popup_f880c3abcc5bd25751153bf65bc39257.setContent(html_7d0ef842f6d93e94bc441990134c9d20);
+            
+        
+
+        marker_5458e2c402b99153de81f9aa5e0ae7f5.bindPopup(popup_f880c3abcc5bd25751153bf65bc39257)
+        ;
+
+        
+    
+    
+            var marker_adb0e6d843cdcd5525482a100dcae6c0 = L.marker(
+                [40.7115, -74.0097],
+                {}
+            ).addTo(feature_group_2463ce90c7c8fcbe78dda970711c4c82);
+        
+    
+            var icon_fb0349c9e92024d6abc3475abc6f1c5a = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "orange", "prefix": "glyphicon"}
+            );
+            marker_adb0e6d843cdcd5525482a100dcae6c0.setIcon(icon_fb0349c9e92024d6abc3475abc6f1c5a);
+        
+    
+        var popup_38bbff3ee5655605ebce24474ed8d32e = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_9e089a5447c796dd604965b3476b79e9 = $(`<div id="html_9e089a5447c796dd604965b3476b79e9" style="width: 100.0%; height: 100.0%;">Oculus</div>`)[0];
+                popup_38bbff3ee5655605ebce24474ed8d32e.setContent(html_9e089a5447c796dd604965b3476b79e9);
+            
+        
+
+        marker_adb0e6d843cdcd5525482a100dcae6c0.bindPopup(popup_38bbff3ee5655605ebce24474ed8d32e)
+        ;
+
+        
+    
+    
+            var marker_7212c1aa156c480eed852e17e1af504d = L.marker(
+                [40.7101, -74.0097],
+                {}
+            ).addTo(feature_group_2463ce90c7c8fcbe78dda970711c4c82);
+        
+    
+            var icon_1535f7426c06f8cc4a95ce6797b0d528 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "orange", "prefix": "glyphicon"}
+            );
+            marker_7212c1aa156c480eed852e17e1af504d.setIcon(icon_1535f7426c06f8cc4a95ce6797b0d528);
+        
+    
+        var popup_2722a8efcd1240dcc466d183cc091143 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_9788b4fb19167ae4722a8a3c98e38be3 = $(`<div id="html_9788b4fb19167ae4722a8a3c98e38be3" style="width: 100.0%; height: 100.0%;">Eataly Downtown</div>`)[0];
+                popup_2722a8efcd1240dcc466d183cc091143.setContent(html_9788b4fb19167ae4722a8a3c98e38be3);
+            
+        
+
+        marker_7212c1aa156c480eed852e17e1af504d.bindPopup(popup_2722a8efcd1240dcc466d183cc091143)
+        ;
+
+        
+    
+    
+            var marker_bf6bdc33daca5abe5c395d0745bc0753 = L.marker(
+                [40.7055, -74.0113],
+                {}
+            ).addTo(feature_group_2463ce90c7c8fcbe78dda970711c4c82);
+        
+    
+            var icon_39edf91c32f6e71d3f360452a68b99bd = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "orange", "prefix": "glyphicon"}
+            );
+            marker_bf6bdc33daca5abe5c395d0745bc0753.setIcon(icon_39edf91c32f6e71d3f360452a68b99bd);
+        
+    
+        var popup_993fcdf9a00ba202ec9e0173bf104278 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_f710ace83223a5829045809c521efec2 = $(`<div id="html_f710ace83223a5829045809c521efec2" style="width: 100.0%; height: 100.0%;">Wall Street / Charging Bull</div>`)[0];
+                popup_993fcdf9a00ba202ec9e0173bf104278.setContent(html_f710ace83223a5829045809c521efec2);
+            
+        
+
+        marker_bf6bdc33daca5abe5c395d0745bc0753.bindPopup(popup_993fcdf9a00ba202ec9e0173bf104278)
+        ;
+
+        
+    
+    
+            var marker_6ddbfc25da213cd615ba8de7c5f2c235 = L.marker(
+                [40.7115, -74.0132],
+                {}
+            ).addTo(feature_group_2463ce90c7c8fcbe78dda970711c4c82);
+        
+    
+            var icon_cb7e44fdc141787db803eea711ce5a66 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "orange", "prefix": "glyphicon"}
+            );
+            marker_6ddbfc25da213cd615ba8de7c5f2c235.setIcon(icon_cb7e44fdc141787db803eea711ce5a66);
+        
+    
+        var popup_d92c7d40bdb7f289e72332eabc4d8cd7 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_610588aaadf2caa803274b3de8d0b050 = $(`<div id="html_610588aaadf2caa803274b3de8d0b050" style="width: 100.0%; height: 100.0%;">Memorial 11-S</div>`)[0];
+                popup_d92c7d40bdb7f289e72332eabc4d8cd7.setContent(html_610588aaadf2caa803274b3de8d0b050);
+            
+        
+
+        marker_6ddbfc25da213cd615ba8de7c5f2c235.bindPopup(popup_d92c7d40bdb7f289e72332eabc4d8cd7)
+        ;
+
+        
+    
+    
+            var marker_75999133a61bd6bff3977e6e77a226fe = L.marker(
+                [40.7163, -74.0086],
+                {}
+            ).addTo(feature_group_2463ce90c7c8fcbe78dda970711c4c82);
+        
+    
+            var icon_f0c60b531743b671f900d3940c58167e = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "orange", "prefix": "glyphicon"}
+            );
+            marker_75999133a61bd6bff3977e6e77a226fe.setIcon(icon_f0c60b531743b671f900d3940c58167e);
+        
+    
+        var popup_85dc37b171f45ddf48dd1a3be28cfbdf = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_b4be576d7f1a889ce767d7fabd0d27fa = $(`<div id="html_b4be576d7f1a889ce767d7fabd0d27fa" style="width: 100.0%; height: 100.0%;">Tribeca (Cena)</div>`)[0];
+                popup_85dc37b171f45ddf48dd1a3be28cfbdf.setContent(html_b4be576d7f1a889ce767d7fabd0d27fa);
+            
+        
+
+        marker_75999133a61bd6bff3977e6e77a226fe.bindPopup(popup_85dc37b171f45ddf48dd1a3be28cfbdf)
+        ;
+
+        
+    
+    
+            var poly_line_9807f55df13eb167a828732ed763532a = L.polyline(
+                [[40.7033, -74.017], [40.7127, -74.0134], [40.7115, -74.0097], [40.7101, -74.0097], [40.7055, -74.0113], [40.7115, -74.0132], [40.7163, -74.0086]],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "orange", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2463ce90c7c8fcbe78dda970711c4c82);
+        
+    
+            var feature_group_68bc755edb48b9028bf04b5b65d023c5 = L.featureGroup(
+                {}
+            ).addTo(map_f78d14c526efc7821421a5adf4476712);
+        
+    
+            var marker_0a28f719231925a61c37e3049d04d505 = L.marker(
+                [40.7527, -73.9772],
+                {}
+            ).addTo(feature_group_68bc755edb48b9028bf04b5b65d023c5);
+        
+    
+            var icon_533ff73a100555f2e10bd07dda1c70d4 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "darkred", "prefix": "glyphicon"}
+            );
+            marker_0a28f719231925a61c37e3049d04d505.setIcon(icon_533ff73a100555f2e10bd07dda1c70d4);
+        
+    
+        var popup_63e78de37ac10f64277de4df4af8f329 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_4124684e0dde91c75a3b2a249123df88 = $(`<div id="html_4124684e0dde91c75a3b2a249123df88" style="width: 100.0%; height: 100.0%;">Grand Central Terminal (Inicio NYC Boroughs Tour)</div>`)[0];
+                popup_63e78de37ac10f64277de4df4af8f329.setContent(html_4124684e0dde91c75a3b2a249123df88);
+            
+        
+
+        marker_0a28f719231925a61c37e3049d04d505.bindPopup(popup_63e78de37ac10f64277de4df4af8f329)
+        ;
+
+        
+    
+    
+            var marker_a0239e0774d2cef0183ff97b3ff2ad4c = L.marker(
+                [40.759, -73.9805],
+                {}
+            ).addTo(feature_group_68bc755edb48b9028bf04b5b65d023c5);
+        
+    
+            var icon_9a41c945f92f5f257b918074fa794858 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "darkred", "prefix": "glyphicon"}
+            );
+            marker_a0239e0774d2cef0183ff97b3ff2ad4c.setIcon(icon_9a41c945f92f5f257b918074fa794858);
+        
+    
+        var popup_1d27936c32516af1cf59bbffd94c1cb2 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_ec3cbb6c8f82087de428e0717334a3f9 = $(`<div id="html_ec3cbb6c8f82087de428e0717334a3f9" style="width: 100.0%; height: 100.0%;">Radio City Music Hall</div>`)[0];
+                popup_1d27936c32516af1cf59bbffd94c1cb2.setContent(html_ec3cbb6c8f82087de428e0717334a3f9);
+            
+        
+
+        marker_a0239e0774d2cef0183ff97b3ff2ad4c.bindPopup(popup_1d27936c32516af1cf59bbffd94c1cb2)
+        ;
+
+        
+    
+    
+            var marker_207763564550ddc2c07e27563f6e7914 = L.marker(
+                [40.8061, -73.9626],
+                {}
+            ).addTo(feature_group_68bc755edb48b9028bf04b5b65d023c5);
+        
+    
+            var icon_8357de66cfba0cb6f1ca5b4ff9b5fe0c = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "darkred", "prefix": "glyphicon"}
+            );
+            marker_207763564550ddc2c07e27563f6e7914.setIcon(icon_8357de66cfba0cb6f1ca5b4ff9b5fe0c);
+        
+    
+        var popup_3002dfea64db956629b40b5b636592e6 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_98c11cdf753260eb3a2651511d4d9fa1 = $(`<div id="html_98c11cdf753260eb3a2651511d4d9fa1" style="width: 100.0%; height: 100.0%;">Catedral St. John the Divine</div>`)[0];
+                popup_3002dfea64db956629b40b5b636592e6.setContent(html_98c11cdf753260eb3a2651511d4d9fa1);
+            
+        
+
+        marker_207763564550ddc2c07e27563f6e7914.bindPopup(popup_3002dfea64db956629b40b5b636592e6)
+        ;
+
+        
+    
+    
+            var marker_7a637407ed3d250da69ad564890cb0bf = L.marker(
+                [40.7527, -74.0071],
+                {}
+            ).addTo(feature_group_68bc755edb48b9028bf04b5b65d023c5);
+        
+    
+            var icon_51397ad291ead123d29be23cc0a5df2a = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "darkred", "prefix": "glyphicon"}
+            );
+            marker_7a637407ed3d250da69ad564890cb0bf.setIcon(icon_51397ad291ead123d29be23cc0a5df2a);
+        
+    
+        var popup_befba041479621ea27c47f4cf50799f8 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_ae0d05e32e79837ed25f9d3d422d6c83 = $(`<div id="html_ae0d05e32e79837ed25f9d3d422d6c83" style="width: 100.0%; height: 100.0%;">Pier 83 (Embarque Harbor Cruise)</div>`)[0];
+                popup_befba041479621ea27c47f4cf50799f8.setContent(html_ae0d05e32e79837ed25f9d3d422d6c83);
+            
+        
+
+        marker_7a637407ed3d250da69ad564890cb0bf.bindPopup(popup_befba041479621ea27c47f4cf50799f8)
+        ;
+
+        
+    
+    
+            var marker_0b64020b06ebc89e12cf04ae3cac8a17 = L.marker(
+                [40.7527, -74.0071],
+                {}
+            ).addTo(feature_group_68bc755edb48b9028bf04b5b65d023c5);
+        
+    
+            var icon_e8ac64d63250cf6ddc9e0b02baae15eb = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "darkred", "prefix": "glyphicon"}
+            );
+            marker_0b64020b06ebc89e12cf04ae3cac8a17.setIcon(icon_e8ac64d63250cf6ddc9e0b02baae15eb);
+        
+    
+        var popup_9d2a3a52e70e2692c6a16b83e65a2feb = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_87acead9f1a246a57920a31dd499cd4c = $(`<div id="html_87acead9f1a246a57920a31dd499cd4c" style="width: 100.0%; height: 100.0%;">Harbor Lights Cruise</div>`)[0];
+                popup_9d2a3a52e70e2692c6a16b83e65a2feb.setContent(html_87acead9f1a246a57920a31dd499cd4c);
+            
+        
+
+        marker_0b64020b06ebc89e12cf04ae3cac8a17.bindPopup(popup_9d2a3a52e70e2692c6a16b83e65a2feb)
+        ;
+
+        
+    
+    
+            var poly_line_74ffdd3e158a4b78ed767e80c9fcaa6a = L.polyline(
+                [[40.7527, -73.9772], [40.759, -73.9805], [40.8061, -73.9626], [40.7527, -74.0071], [40.7527, -74.0071]],
+                {"bubblingMouseEvents": true, "color": "darkred", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "darkred", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(feature_group_68bc755edb48b9028bf04b5b65d023c5);
+        
+    
+            var feature_group_d0a85cfd5c47c854ce1a3d88494d010b = L.featureGroup(
+                {}
+            ).addTo(map_f78d14c526efc7821421a5adf4476712);
+        
+    
+            var marker_c65b791f09b46f37a09d2547ed51a67e = L.marker(
+                [40.7542, -74.001],
+                {}
+            ).addTo(feature_group_d0a85cfd5c47c854ce1a3d88494d010b);
+        
+    
+            var icon_88a1187e81ebb696e4206e80f2ea3459 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "cadetblue", "prefix": "glyphicon"}
+            );
+            marker_c65b791f09b46f37a09d2547ed51a67e.setIcon(icon_88a1187e81ebb696e4206e80f2ea3459);
+        
+    
+        var popup_62d415998c87369c6197d2908f1fecfa = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_a48e44a88ecf5f07876512f1a959b007 = $(`<div id="html_a48e44a88ecf5f07876512f1a959b007" style="width: 100.0%; height: 100.0%;">Vessel en Hudson Yards</div>`)[0];
+                popup_62d415998c87369c6197d2908f1fecfa.setContent(html_a48e44a88ecf5f07876512f1a959b007);
+            
+        
+
+        marker_c65b791f09b46f37a09d2547ed51a67e.bindPopup(popup_62d415998c87369c6197d2908f1fecfa)
+        ;
+
+        
+    
+    
+            var marker_b2e7565b2cee456617b94f2d628a5d13 = L.marker(
+                [40.7443, -74.0052],
+                {}
+            ).addTo(feature_group_d0a85cfd5c47c854ce1a3d88494d010b);
+        
+    
+            var icon_a14f054e6886d0b1e8657905d9f14cb0 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "cadetblue", "prefix": "glyphicon"}
+            );
+            marker_b2e7565b2cee456617b94f2d628a5d13.setIcon(icon_a14f054e6886d0b1e8657905d9f14cb0);
+        
+    
+        var popup_300c219f7715e798876314ef1bf72178 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_0fa4f116abef028394c4760611424e97 = $(`<div id="html_0fa4f116abef028394c4760611424e97" style="width: 100.0%; height: 100.0%;">Pier 57</div>`)[0];
+                popup_300c219f7715e798876314ef1bf72178.setContent(html_0fa4f116abef028394c4760611424e97);
+            
+        
+
+        marker_b2e7565b2cee456617b94f2d628a5d13.bindPopup(popup_300c219f7715e798876314ef1bf72178)
+        ;
+
+        
+    
+    
+            var marker_72ca5acebbd686436e34cee102d3ab47 = L.marker(
+                [40.752, -73.98],
+                {}
+            ).addTo(feature_group_d0a85cfd5c47c854ce1a3d88494d010b);
+        
+    
+            var icon_50752a8f15956370f875743e371ba4cc = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "cadetblue", "prefix": "glyphicon"}
+            );
+            marker_72ca5acebbd686436e34cee102d3ab47.setIcon(icon_50752a8f15956370f875743e371ba4cc);
+        
+    
+        var popup_b90b6b74900948e7f5c44fe75611d53c = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_0d137b5dd8140f5c2fd109eb661268ef = $(`<div id="html_0d137b5dd8140f5c2fd109eb661268ef" style="width: 100.0%; height: 100.0%;">Quinta y Séptima Avenidas</div>`)[0];
+                popup_b90b6b74900948e7f5c44fe75611d53c.setContent(html_0d137b5dd8140f5c2fd109eb661268ef);
+            
+        
+
+        marker_72ca5acebbd686436e34cee102d3ab47.bindPopup(popup_b90b6b74900948e7f5c44fe75611d53c)
+        ;
+
+        
+    
+    
+            var marker_57c6027f5622c24ced85e545cc5353ff = L.marker(
+                [40.81, -73.95],
+                {}
+            ).addTo(feature_group_d0a85cfd5c47c854ce1a3d88494d010b);
+        
+    
+            var icon_c23f29ce1eeabe98bd07a5b9f8bd759d = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "cadetblue", "prefix": "glyphicon"}
+            );
+            marker_57c6027f5622c24ced85e545cc5353ff.setIcon(icon_c23f29ce1eeabe98bd07a5b9f8bd759d);
+        
+    
+        var popup_45f177143a03ced842de8af681438894 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_9438bda0e93a503ab28280f3330b91f7 = $(`<div id="html_9438bda0e93a503ab28280f3330b91f7" style="width: 100.0%; height: 100.0%;">Apollo Theater (Harlem)</div>`)[0];
+                popup_45f177143a03ced842de8af681438894.setContent(html_9438bda0e93a503ab28280f3330b91f7);
+            
+        
+
+        marker_57c6027f5622c24ced85e545cc5353ff.bindPopup(popup_45f177143a03ced842de8af681438894)
+        ;
+
+        
+    
+    
+            var poly_line_ced1d8102c9a58a6bc9014295b91538a = L.polyline(
+                [[40.7542, -74.001], [40.7443, -74.0052], [40.752, -73.98], [40.81, -73.95]],
+                {"bubblingMouseEvents": true, "color": "cadetblue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "cadetblue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(feature_group_d0a85cfd5c47c854ce1a3d88494d010b);
+        
+    
+            var layer_control_8ba3e7264778ba8c3093206dd021ab68 = {
+                base_layers : {
+                    "openstreetmap" : tile_layer_f2d1c68bdf4c53bc446e630ccbca6aa0,
+                },
+                overlays :  {
+                    "D\u00eda 1 - Jueves 08/05" : feature_group_9db4f1fb66aa20c7601c9301482e6310,
+                    "D\u00eda 2 - Viernes 09/05" : feature_group_0f0e890533f28fb12c716e7404276637,
+                    "D\u00eda 3 - S\u00e1bado 10/05" : feature_group_334006bdd90d5c8d894557e0c96c6adb,
+                    "D\u00eda 4 - Domingo 11/05" : feature_group_b2b9e6c70c67bcb26be5d68c9e5973c7,
+                    "D\u00eda 5 - Lunes 12/05" : feature_group_2463ce90c7c8fcbe78dda970711c4c82,
+                    "D\u00eda 6 - Martes 13/05" : feature_group_68bc755edb48b9028bf04b5b65d023c5,
+                    "D\u00eda 7 - Mi\u00e9rcoles 14/05" : feature_group_d0a85cfd5c47c854ce1a3d88494d010b,
+                },
+            };
+            L.control.layers(
+                layer_control_8ba3e7264778ba8c3093206dd021ab68.base_layers,
+                layer_control_8ba3e7264778ba8c3093206dd021ab68.overlays,
+                {"autoZIndex": true, "collapsed": true, "position": "topright"}
+            ).addTo(map_f78d14c526efc7821421a5adf4476712);
+        
+</script>
+</html>
